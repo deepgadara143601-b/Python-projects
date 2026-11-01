@@ -1,0 +1,56 @@
+
+user_settings = {
+    "theme": "dark",
+    "language": "english"
+}
+
+
+def add_setting(settings, new_setting):
+    setting_name, setting_value = new_setting
+
+    setting_name = setting_name.lower()
+    setting_value = setting_value.lower()
+
+    if setting_name in settings.keys():
+        return f"Setting '{setting_name}' already exists! Cannot add a new setting with this name."
+
+    settings.update({setting_name: setting_value})
+
+    return f"Setting '{setting_name}' added with value '{setting_value}' successfully!"
+
+
+def update_setting(settings, updated_setting):
+    setting_name, setting_value = updated_setting
+
+    setting_name = setting_name.lower()
+    setting_value = setting_value.lower()
+
+    if setting_name not in settings.keys():
+        return f"Setting '{setting_name}' does not exist! Cannot update a non-existing setting."
+
+    settings.update({setting_name: setting_value})
+
+    return f"Setting '{setting_name}' updated to '{setting_value}' successfully!"
+
+
+def delete_setting(settings, setting_name):
+    setting_name = setting_name.lower()
+
+    if setting_name not in settings:
+        return "Setting not found!"
+
+    settings.pop(setting_name)
+
+    return f"Setting '{setting_name}' deleted successfully!"
+
+
+def view_settings(settings):
+    if len(settings) == 0:
+        return "No settings available."
+
+    output = "Current User Settings:\n"
+
+    for setting, value in settings.items():
+        output += "{}: {}\n".format(setting.title(), value)
+
+    return output
