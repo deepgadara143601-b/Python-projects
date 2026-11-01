@@ -1,0 +1,100 @@
+
+class Category:
+    def __init__(self, name):
+        self.name = name
+        self.transactions = []
+
+    def deposit(self, amount, description=""):
+        transaction = {
+            "amount": amount,
+            "description": description
+        }
+        self.transactions.append(transaction)
+
+    def withdraw(self, amount, description=""):
+        if amount > self.get_balance():
+            return False
+
+        self.transactions.append({
+            "amount": -amount,
+            "description": description
+        })
+        return True
+
+    def get_balance(self):
+        balance = 0
+        for transaction in self.transactions:
+            balance += transaction["amount"]
+        return balance
+
+    def transfer(self, amount, category):
+        if amount > self.get_balance():
+            return False
+
+        self.withdraw(amount, "Transfer to " + category.name)
+        category.deposit(amount, "Transfer from " + self.name)
+        return True
+
+    def check_funds(self, amount):
+        return self.get_balance() >= amount
+
+    def __str__(self):
+        heading = self.name.center(30, "*") + "\n"
+        details = ""
+
+        for transaction in self.transactions:
+            description = transaction["description"][:23].ljust(23)
+            amount = "{:.2f}".format(transaction["amount"]).rjust(7)
+            details += description + amount + "\n"
+
+        return heading + details + "Total: {:.2f}".format(self.get_balance())
+
+
+def create_spend_chart(categories):
+    result = "Percentage spent by category\n"
+    expenses = []
+
+    for category in categories:
+        total = 0
+
+        for transaction in category.transactions:
+            if transaction["amount"] < 0:
+                total += abs(transaction["amount"])
+
+        expenses.append(total)
+
+    overall_expense = sum(expenses)
+
+    if overall_expense > 0:
+        percentages = []
+        for expense in expenses:
+            percentage = int(expense / overall_expense * 100)
+            percentages.append((percentage // 10) * 10)
+    else:
+        percentages = [0 for category in categories]
+
+    for level in range(100, -1, -10):
+        result += f"{level:>3}| "
+
+        for percentage in percentages:
+            result += "o  " if percentage >= level else "   "
+
+        result += "\n"
+
+    result += "    " + "-" * (len(categories) * 3 + 1) + "\n"
+
+    longest_name = max(len(category.name) for category in categories)
+
+    for position in range(longest_name):
+        result += "     "
+
+        for category in categories:
+            if position < len(category.name):
+                result += category.name[position] + "  "
+            else:
+                result += "   "
+
+        if position != longest_name - 1:
+            result += "\n"
+
+    return result
